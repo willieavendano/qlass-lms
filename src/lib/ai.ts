@@ -113,10 +113,14 @@ function buildModel(cfg: ResolvedAiConfig) {
     case "anthropic":
       return createAnthropic({ apiKey: cfg.apiKey ?? undefined })(cfg.model);
     case "openai-compatible":
+      // Enable structured outputs so the JSON schema is enforced by the endpoint
+      // (Ollama 0.5+/vLLM support this). Without it, generateObject's schema is
+      // dropped and small models return non-conforming JSON → NoObjectGenerated.
       return createOpenAICompatible({
         name: "local",
         baseURL: cfg.baseUrl!,
         apiKey: cfg.apiKey ?? undefined,
+        supportsStructuredOutputs: true,
       })(cfg.model);
   }
 }
