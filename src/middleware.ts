@@ -12,6 +12,7 @@ export const config = {
     "/api/grades/:path*",
     "/api/notifications/:path*",
     "/api/admin/:path*",
+    "/api/settings/:path*",
     "/api/uploads/:path*",
     "/api/import/:path*",
   ],
