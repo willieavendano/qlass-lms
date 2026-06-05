@@ -43,6 +43,8 @@ Two env files are required and must stay in sync: the Prisma CLI reads `.env`, N
 
 **Storage is provider-abstracted** in `src/lib/storage.ts`, switched by `STORAGE_PROVIDER` (`local` | `s3` | `supabase`). `createUploadUrl`/`getDownloadUrl` return presigned URLs for S3/Supabase; for `local` they point at `/api/uploads/local`, which reads/writes `UPLOAD_DIR` (default `./uploads`). Uploads use a sign-then-upload flow via `/api/uploads/sign`.
 
+**Agentic course builder** (`src/lib/agent/*`, `src/lib/ai.ts`, `src/lib/oer.ts`, `src/lib/crypto.ts`): a teacher can "Build with AI" on the classwork page. A server-side pipeline (Vercel AI SDK, zod structured output) plans a unit outline and drafts assignments + an explainer material; the teacher reviews and publishes (review gate — content is **never** auto-published to students). Providers are BYOK/local/env, resolved by `resolveAiConfig` (user `UserAiSetting` → instance `SystemSettings` → env `AI_PROVIDER`/etc.); keys are encrypted at rest via `ENCRYPTION_KEY` (AES-256-GCM in `crypto.ts`). Generated posts carry `Post.aiGenerated = true`. Each run is an auditable `AgentRun` row; per-course context lives in `CourseMemory`. OER usage is link-only with a proprietary-source denylist (College Board/Canva) in `src/lib/oer.ts`. See `docs/ai-models.md` for model guidance.
+
 **Path alias:** `@/*` → `src/*`.
 
 ## Data model (prisma/schema.prisma)

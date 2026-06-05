@@ -18,6 +18,7 @@ type Post = {
   dueDate: string | null;
   points: number | null;
   status: string;
+  aiGenerated?: boolean;
   category: { name: string } | null;
 };
 
@@ -164,6 +165,9 @@ export default function ClassworkPage({ params }: { params: { id: string } }) {
                             )}
                             {post.status === "DRAFT" && (
                               <Badge variant="outline">Draft</Badge>
+                            )}
+                            {post.aiGenerated && (
+                              <Badge variant="outline">AI</Badge>
                             )}
                           </div>
                         </div>
