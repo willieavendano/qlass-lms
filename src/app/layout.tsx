@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Fraunces } from "next/font/google";
+import { Fraunces, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { AppHeader } from "@/components/layout/app-header";
@@ -11,6 +11,15 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-fraunces",
   weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+// High-contrast display serif used as an italic accent (e.g. the hero "classroom OS").
+const dmSerif = DM_Serif_Display({
+  subsets: ["latin"],
+  variable: "--font-dm-serif",
+  weight: "400",
   style: ["normal", "italic"],
   display: "swap",
 });
@@ -41,7 +50,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} min-h-screen`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${dmSerif.variable} min-h-screen`}>
         <Providers>
           <AppHeader />
           <main>{children}</main>

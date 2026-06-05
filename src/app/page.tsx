@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, Shield, Users, Zap } from "lucide-react";
+import { BookOpen, Github, Shield, Users, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function LandingPage() {
@@ -14,23 +14,30 @@ export default function LandingPage() {
         />
         <div className="relative mx-auto max-w-4xl text-center">
           <p className="eyebrow mb-6 justify-center">
-            Open source · MIT · Self-hostable
+            Quantum · Quality · Agentic
           </p>
           <h1 className="font-display text-5xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-7xl dark:text-white">
-            Teaching, made{" "}
-            <span className="italic text-teal-700 dark:text-teal-400">clear</span>
+            The{" "}
+            <em className="font-dm-serif italic text-teal-700 dark:text-teal-400">
+              classroom OS
+            </em>{" "}
+            for modern educators
           </h1>
           <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-slate-600 dark:text-slate-300">
-            A classroom platform for announcements, assignments, submissions, and
-            grading — without vendor lock-in. Bring your own infrastructure, keep
-            your data, deploy in minutes.
+            An open-source LMS where AI agents handle the admin — so you can focus
+            on what actually matters: teaching.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link href="/register">
-              <Button size="lg">Start for free</Button>
+              <Button size="lg">Get early access</Button>
             </Link>
-            <Link href="https://github.com" target="_blank" rel="noopener">
-              <Button variant="outline" size="lg">
+            <Link
+              href="https://github.com/willieavendano/qlass-lms"
+              target="_blank"
+              rel="noopener"
+            >
+              <Button variant="ghost" size="lg">
+                <Github className="h-5 w-5" aria-hidden />
                 View on GitHub
               </Button>
             </Link>
@@ -74,8 +81,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="px-4 py-8 text-center text-sm text-slate-500">
-        © {new Date().getFullYear()} Qlass · MIT License
+      <footer className="border-t border-slate-200/70 px-4 py-8 dark:border-slate-800">
+        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 text-sm text-slate-500 sm:flex-row">
+          <p>MIT License · Built for educators, by educators</p>
+          <p className="font-display font-medium text-slate-600 dark:text-slate-400">
+            qlass.ai
+          </p>
+        </div>
       </footer>
     </div>
   );

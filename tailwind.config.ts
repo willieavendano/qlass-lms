@@ -28,6 +28,7 @@ const config: Config = {
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
         display: ["var(--font-fraunces)", "Georgia", "serif"],
+        "dm-serif": ["var(--font-dm-serif)", "Georgia", "serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
