@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { AiSettings } from "@/components/settings/ai-settings";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -22,6 +23,11 @@ export default function SettingsPage() {
           <dd className="font-medium">{session?.user?.systemRole}</dd>
         </div>
       </dl>
+
+      <div className="mt-8">
+        <AiSettings />
+      </div>
+
       <p className="mt-8 text-sm text-slate-500">
         Email digest preferences and profile editing coming in a future release.
       </p>

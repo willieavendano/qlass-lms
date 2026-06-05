@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { BuildWithAi } from "@/components/class/build-with-ai";
 import { formatDueDate } from "@/lib/utils";
 
 type Post = {
@@ -17,6 +18,7 @@ type Post = {
   dueDate: string | null;
   points: number | null;
   status: string;
+  aiGenerated?: boolean;
   category: { name: string } | null;
 };
 
@@ -72,10 +74,13 @@ export default function ClassworkPage({ params }: { params: { id: string } }) {
       <div className="flex items-center justify-between gap-4">
         <p className="eyebrow">Classwork</p>
         {isTeacher && (
-          <Button size="sm" onClick={() => setShowForm(!showForm)}>
-            <Plus className="h-4 w-4" aria-hidden />
-            Create assignment
-          </Button>
+          <div className="flex items-center gap-2">
+            <BuildWithAi classId={params.id} onPublished={load} />
+            <Button size="sm" onClick={() => setShowForm(!showForm)}>
+              <Plus className="h-4 w-4" aria-hidden />
+              Create assignment
+            </Button>
+          </div>
         )}
       </div>
 
@@ -160,6 +165,9 @@ export default function ClassworkPage({ params }: { params: { id: string } }) {
                             )}
                             {post.status === "DRAFT" && (
                               <Badge variant="outline">Draft</Badge>
+                            )}
+                            {post.aiGenerated && (
+                              <Badge variant="outline">AI</Badge>
                             )}
                           </div>
                         </div>
