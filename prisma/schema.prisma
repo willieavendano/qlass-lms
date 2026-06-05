@@ -85,6 +85,8 @@ model User {
   comments      Comment[]
   notifications Notification[]
   attachments   Attachment[]     @relation("UploadedBy")
+  aiSetting     UserAiSetting?
+  agentRuns     AgentRun[]
 }
 
 model Account {
@@ -141,6 +143,8 @@ model Class {
   memberships  ClassMembership[]
   posts        Post[]
   categories   AssignmentCategory[]
+  courseMemory CourseMemory?
+  agentRuns    AgentRun[]
 }
 
 model ClassMembership {
@@ -184,6 +188,7 @@ model Post {
   points      Int?
   youtubeUrl  String?
   linkUrl     String?
+  aiGenerated Boolean    @default(false)
   publishedAt DateTime?
   googleCourseWorkId   String? @unique
   googleAnnouncementId String? @unique
@@ -330,5 +335,57 @@ model SystemSettings {
   storageProvider String  @default("local")
   s3Bucket        String?
   s3Region        String?
+  aiProvider      String?
+  aiBaseUrl       String?
+  aiModel         String?
+  aiApiKeyEnc     String?  @db.Text
+  aiWebSearch     Boolean  @default(false)
   updatedAt       DateTime @updatedAt
+}
+
+model CourseMemory {
+  id         String   @id @default(cuid())
+  classId    String   @unique
+  subject    String?
+  gradeLevel String?
+  standards  String?  @db.Text
+  summary    String?  @db.Text
+  facts      Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+}
+
+model AgentRun {
+  id        String   @id @default(cuid())
+  classId   String
+  userId    String
+  kind      String   @default("UNIT_BUILD")
+  status    String   @default("PENDING")
+  input     Json
+  outline   Json?
+  drafts    Json?
+  model     String?
+  error     String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@index([classId])
+}
+
+model UserAiSetting {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  provider  String
+  baseUrl   String?
+  model     String?
+  apiKeyEnc String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
