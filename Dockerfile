@@ -1,7 +1,10 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+# --ignore-scripts: skip the `postinstall: prisma generate` here (the schema
+# isn't copied in this stage). The builder stage runs `prisma generate` after
+# copying the full source.
+RUN npm ci --ignore-scripts
 
 FROM node:20-alpine AS builder
 WORKDIR /app
@@ -20,7 +23,12 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+# Full node_modules (superset of the standalone trace) so the Railway
+# pre-deploy command (`prisma db push`) has the complete Prisma CLI dep tree
+# and bin symlink. server.js still resolves its modules from here.
+COPY --from=builder /app/node_modules ./node_modules
+# Writable uploads dir for the mounted volume (STORAGE_PROVIDER=local).
+RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
