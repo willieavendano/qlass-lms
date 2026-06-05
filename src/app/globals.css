@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm "paper & ink" base — reads like quality stationery, not SaaS gray. */
+    --background: 40 33% 97%;
+    --foreground: 200 24% 12%;
+    --primary: 173 80% 32%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 32 95% 44%;
+    --muted: 40 16% 92%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Deep ink-teal. */
+    --background: 200 32% 7%;
+    --foreground: 40 24% 94%;
+    --primary: 173 58% 45%;
+    --muted: 200 24% 14%;
+  }
+
+  * {
+    @apply border-slate-200 dark:border-slate-800;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply text-[hsl(var(--foreground))] antialiased;
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+    /* Layered atmosphere: a soft teal glow up top, a warm ochre wash bottom-right,
+       over the paper base. The grain overlay (below) sits on top for texture. */
+    background-color: hsl(var(--background));
+    background-image: radial-gradient(
+        55rem 28rem at 50% -8rem,
+        hsl(173 70% 45% / 0.08),
+        transparent 70%
+      ),
+      radial-gradient(
+        50rem 40rem at 110% 120%,
+        hsl(32 90% 55% / 0.06),
+        transparent 70%
+      );
+    background-attachment: fixed;
+  }
+
+  /* Paper grain — a faint fractal-noise overlay for tactile texture. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+  .dark body::before {
+    opacity: 0.6;
+  }
+
+  /* Keep app content above the grain layer. */
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  ::selection {
+    @apply bg-teal-200 text-teal-950;
+  }
+
+  /* Quiet, modern scrollbars. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(215 16% 75%) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-300 dark:bg-slate-700;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400 dark:bg-slate-600;
+  }
+}
+
+@layer components {
+  /* Reusable brand gradient for hero CTAs / accents. */
+  .bg-brand-gradient {
+    background-image: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  }
+
+  /* Editorial eyebrow: small-caps, tracked label preceded by a short teal rule. */
+  .eyebrow {
+    @apply inline-flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-400;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-px w-7 bg-teal-600/70 dark:bg-teal-400/70;
+  }
+
+  /* Optical sizing for the display serif wherever it's used. */
+  .font-display {
+    font-optical-sizing: auto;
+  }
+}
