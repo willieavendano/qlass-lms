@@ -5,6 +5,7 @@ import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
+import { rateLimit } from "@/lib/ratelimit";
 import type { SystemRole } from "@prisma/client";
 
 declare module "next-auth" {
@@ -73,8 +74,17 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
+        const email = credentials.email.toLowerCase();
+        // Throttle password guessing per account. Returning null surfaces as a
+        // normal "invalid credentials" error, so an attacker can't distinguish
+        // a lockout from a wrong password.
+        const limit = rateLimit(`login:${email}`, {
+          limit: 10,
+          windowMs: 5 * 60 * 1000,
+        });
+        if (!limit.ok) return null;
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase() },
+          where: { email },
         });
         if (!user?.passwordHash || user.suspended) return null;
         const valid = await bcrypt.compare(

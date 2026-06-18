@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ClassRole } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
+import { rateLimit, tooManyRequests } from "@/lib/ratelimit";
 
 const schema = z.object({
   joinCode: z.string().min(6).max(10),
@@ -10,6 +11,13 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   const session = await requireSession();
+  // Throttle join-code guessing per user (codes are short and enumerable).
+  const limit = rateLimit(`join:${session.user.id}`, {
+    limit: 15,
+    windowMs: 10 * 60 * 1000,
+  });
+  if (!limit.ok) return tooManyRequests(limit.retryAfterMs);
+
   try {
     const { joinCode } = schema.parse(await req.json());
     const classroom = await prisma.class.findFirst({

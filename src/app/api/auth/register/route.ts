@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { SystemRole } from "@prisma/client";
+import { rateLimit, clientIp, tooManyRequests } from "@/lib/ratelimit";
 
 const schema = z.object({
   name: z.string().min(1).max(100),
@@ -12,6 +13,13 @@ const schema = z.object({
 });
 
 export async function POST(req: Request) {
+  // Throttle anonymous account creation per source IP.
+  const limit = rateLimit(`register:${clientIp(req)}`, {
+    limit: 5,
+    windowMs: 10 * 60 * 1000,
+  });
+  if (!limit.ok) return tooManyRequests(limit.retryAfterMs);
+
   try {
     const body = await req.json();
     const data = schema.parse(body);
