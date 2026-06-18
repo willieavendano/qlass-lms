@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { ClipboardList, Plus, ChevronRight } from "lucide-react";
+import { ClipboardList, Plus, ChevronRight, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -76,6 +76,16 @@ export default function ClassworkPage({ params }: { params: { id: string } }) {
         {isTeacher && (
           <div className="flex items-center gap-2">
             <BuildWithAi classId={params.id} onPublished={load} />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                window.location.href = `/api/classes/${params.id}/grades/export`;
+              }}
+            >
+              <Download className="h-4 w-4" aria-hidden />
+              Export grades
+            </Button>
             <Button size="sm" onClick={() => setShowForm(!showForm)}>
               <Plus className="h-4 w-4" aria-hidden />
               Create assignment
