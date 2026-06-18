@@ -1,0 +1,34 @@
+name: Bug report
+description: Report a reproducible Qlass problem
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include account role, route, input data, and expected result.
+      placeholder: |
+        1. Sign in as ...
+        2. Open ...
+        3. Click ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Local Docker, Railway, Vercel, browser, Node version, database provider.
+  - type: textarea
+    id: impact
+    attributes:
+      label: Classroom impact
+      description: Does this affect teachers, students, grading, submissions, or data safety?

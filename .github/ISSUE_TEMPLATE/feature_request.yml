@@ -1,0 +1,40 @@
+name: Feature request
+description: Propose a classroom, self-hosting, connector, or agent feature
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What classroom or admin problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed solution
+      description: Describe the smallest useful version.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Classes and stream
+        - Classwork and submissions
+        - Grading
+        - Google Classroom import
+        - Self-hosting and deployment
+        - Agentic course builder
+        - Privacy and security
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What must be true for this to be done?
