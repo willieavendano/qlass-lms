@@ -4,6 +4,7 @@ import { ClassRole, NotificationType, PostStatus, PostType } from "@prisma/clien
 import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { requireClassAccess } from "@/lib/permissions";
+import { notifyUsers } from "@/lib/notify";
 
 const schema = z.object({
   classId: z.string(),
@@ -56,17 +57,17 @@ export async function POST(req: Request) {
         },
         select: { userId: true },
       });
-      await prisma.notification.createMany({
-        data: students.map((s) => ({
-          userId: s.userId,
+      await notifyUsers(
+        students.map((s) => s.userId),
+        {
           type: NotificationType.ASSIGNMENT_DUE,
           title: `New assignment: ${post.title}`,
           body: post.dueDate
             ? `Due ${post.dueDate.toLocaleDateString()}`
             : undefined,
           link: `/class/${data.classId}/assignments/${post.id}`,
-        })),
-      });
+        }
+      );
     }
     return NextResponse.json({ post }, { status: 201 });
   } catch (e) {

@@ -3,6 +3,7 @@ import { ClassRole, NotificationType, PostStatus, PostType } from "@prisma/clien
 import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { requireClassAccess } from "@/lib/permissions";
+import { notifyUsers } from "@/lib/notify";
 
 export async function GET(
   req: Request,
@@ -75,15 +76,15 @@ export async function POST(
       where: { classId: params.id, userId: { not: session.user.id } },
       select: { userId: true },
     });
-    await prisma.notification.createMany({
-      data: members.map((m) => ({
-        userId: m.userId,
+    await notifyUsers(
+      members.map((m) => m.userId),
+      {
         type: NotificationType.ANNOUNCEMENT,
         title: `New announcement in class`,
         body: post.title,
         link: `/class/${params.id}/stream`,
-      })),
-    });
+      }
+    );
   }
   return NextResponse.json({ post }, { status: 201 });
 }

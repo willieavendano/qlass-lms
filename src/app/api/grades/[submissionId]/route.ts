@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ClassRole, NotificationType, SubmissionStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
+import { notifyUsers } from "@/lib/notify";
 
 const schema = z
   .object({
@@ -79,14 +80,11 @@ export async function PATCH(
       },
     });
 
-    await prisma.notification.create({
-      data: {
-        userId: submission.studentId,
-        type: NotificationType.GRADE_POSTED,
-        title: `Grade posted: ${submission.assignment.post.title}`,
-        body: data.points != null ? `${data.points} points` : undefined,
-        link: `/class/${submission.assignment.post.classId}/assignments/${submission.assignment.postId}`,
-      },
+    await notifyUsers([submission.studentId], {
+      type: NotificationType.GRADE_POSTED,
+      title: `Grade posted: ${submission.assignment.post.title}`,
+      body: data.points != null ? `${data.points} points` : undefined,
+      link: `/class/${submission.assignment.post.classId}/assignments/${submission.assignment.postId}`,
     });
 
     return NextResponse.json({ grade });
