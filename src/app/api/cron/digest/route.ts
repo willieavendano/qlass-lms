@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import { EmailDigest } from "@prisma/client";
 import { prisma } from "@/lib/db";
@@ -15,7 +16,9 @@ export async function GET(req: Request) {
   if (!secret) {
     return NextResponse.json({ error: "CRON_SECRET is not set" }, { status: 503 });
   }
-  if (req.headers.get("authorization") !== `Bearer ${secret}`) {
+  const provided = Buffer.from(req.headers.get("authorization") ?? "");
+  const expected = Buffer.from(`Bearer ${secret}`);
+  if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   if (!isEmailConfigured()) {
