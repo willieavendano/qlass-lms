@@ -1,11 +1,13 @@
 import { generateStructured, type ResolvedAiConfig } from "@/lib/ai";
-import { OER_SOURCES } from "@/lib/oer";
+import { DENIED_DOMAINS, OER_SOURCES } from "@/lib/oer";
 import {
   unitOutlineSchema,
   unitDraftsSchema,
+  unitReviewSchema,
   type BuildInput,
   type UnitOutline,
   type UnitDrafts,
+  type UnitReview,
 } from "./schemas";
 
 const SOURCE_HINT = OER_SOURCES.map((s) => `${s.name} (${s.domain})`).join(", ");
@@ -42,4 +44,46 @@ The material: a title and a clear written explainer (plain text/markdown) studen
 When you reference outside resources, only suggest openly-licensed ones such as: ${SOURCE_HINT}.
 Do NOT reproduce copyrighted material (e.g. College Board / AP Classroom).`;
   return generateStructured(cfg, unitDraftsSchema, prompt);
+}
+
+/** Builds the reviewer prompt. Pure — exported for tests. */
+export function buildReviewPrompt(
+  input: BuildInput,
+  outline: UnitOutline,
+  drafts: UnitDrafts
+): string {
+  const assignments = drafts.assignments
+    .map(
+      (a, i) =>
+        `Assignment ${i + 1}: ${a.title} (${a.points} pts)\nInstructions: ${a.instructions}\nQuestions: ${a.questions.join(" | ")}`
+    )
+    .join("\n\n");
+  return `You are a skeptical instructional reviewer checking AI-drafted classwork before a teacher sees it.
+Unit: "${outline.title}"${input.gradeLevel ? ` — intended grade level: ${input.gradeLevel}` : ""}
+Objectives: ${outline.objectives.join("; ")}
+
+${assignments}
+
+Material: ${drafts.material.title}\n${drafts.material.body}
+
+Review for:
+1. CLARITY — are student-facing instructions unambiguous and complete? (clarityScore 1-5)
+2. GRADE LEVEL — is reading level and difficulty right for the intended grade? (gradeLevelFit)
+3. SOURCE SAFETY — flag any reference to proprietary/copyrighted sources, especially these denied domains: ${DENIED_DOMAINS.join(", ")}. (sourceSafety)
+4. Anything factually dubious or pedagogically weak.
+
+Report specific findings with severity: "fix" (must address), "warn" (should address), "info" (nice to know).
+Be concise and concrete; do not invent problems if the drafts are sound.`;
+}
+
+/** Step 4: REVIEW — advisory AI pass over the drafts (clarity, grade level,
+ *  source safety). Callers should fail open: a reviewer error must never
+ *  block the teacher from seeing the drafts. */
+export async function reviewDrafts(
+  cfg: ResolvedAiConfig | null,
+  input: BuildInput,
+  outline: UnitOutline,
+  drafts: UnitDrafts
+): Promise<UnitReview> {
+  return generateStructured(cfg, unitReviewSchema, buildReviewPrompt(input, outline, drafts));
 }

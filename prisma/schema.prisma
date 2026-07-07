@@ -367,6 +367,7 @@ model AgentRun {
   input     Json
   outline   Json?
   drafts    Json?
+  review    Json?
   model     String?
   error     String?  @db.Text
   createdAt DateTime @default(now())
