@@ -26,6 +26,23 @@ STORAGE_PROVIDER=local
 
 For Google Classroom import, configure Google OAuth and the Classroom/Drive scopes described in `.env.example`.
 
+## Email notifications and the daily digest
+
+Email is optional: without `SMTP_HOST`, sends are logged no-ops and in-app
+notifications still work. To deliver email, set the `SMTP_*` vars from
+`.env.example`. Users choose Immediate / Daily digest / Off in Settings.
+
+The daily digest is sent by an external scheduler calling:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" https://your-domain.example/api/cron/digest
+```
+
+Set `CRON_SECRET` in the app environment and schedule the call once a day
+(Railway cron, GitHub Actions schedule, or any cron host). The endpoint is
+idempotent per day: it only emails unread notifications created since each
+user's last digest.
+
 ## Production database policy
 
 Local prototyping can use:
