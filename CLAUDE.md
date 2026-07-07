@@ -18,7 +18,7 @@ npm run prisma:validate  # Validate Prisma schema
 npm run db:push          # Push schema.prisma to DB for local prototyping
 npm run db:migrate       # Create/apply a local Prisma migration
 npm run db:migrate:deploy # Apply checked-in migrations in production
-npm run db:seed          # tsx prisma/seed.ts -- demo users + DEMOCLS class
+npm run db:seed          # tsx prisma/seed.ts -- demo users + the six 2026-27 classes (student joins Physics via PHYSICS)
 npm run db:studio        # Prisma Studio
 npm run db:generate      # Regenerate Prisma client
 ```
