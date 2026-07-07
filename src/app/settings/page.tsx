@@ -2,6 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import { AiSettings } from "@/components/settings/ai-settings";
+import { NotificationSettings } from "@/components/settings/notification-settings";
+import { DataSettings } from "@/components/settings/data-settings";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -25,11 +27,21 @@ export default function SettingsPage() {
       </dl>
 
       <div className="mt-8">
+        <NotificationSettings />
+      </div>
+
+      <div className="mt-8">
         <AiSettings />
       </div>
 
+      {session?.user?.email && (
+        <div className="mt-8">
+          <DataSettings email={session.user.email} />
+        </div>
+      )}
+
       <p className="mt-8 text-sm text-slate-500">
-        Email digest preferences and profile editing coming in a future release.
+        Profile editing coming in a future release.
       </p>
     </div>
   );

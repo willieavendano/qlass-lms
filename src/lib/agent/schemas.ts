@@ -29,6 +29,23 @@ export const unitDraftsSchema = z.object({
 });
 export type UnitDrafts = z.infer<typeof unitDraftsSchema>;
 
+export const reviewFindingSchema = z.object({
+  target: z.string().min(1), // which draft it concerns, e.g. "assignment 2: Photosynthesis lab"
+  severity: z.enum(["info", "warn", "fix"]),
+  issue: z.string().min(1),
+  suggestion: z.string().optional(),
+});
+export type ReviewFinding = z.infer<typeof reviewFindingSchema>;
+
+export const unitReviewSchema = z.object({
+  summary: z.string().min(1),
+  clarityScore: z.number().int().min(1).max(5),
+  gradeLevelFit: z.enum(["below", "on_level", "above"]),
+  sourceSafety: z.enum(["pass", "flagged"]),
+  findings: z.array(reviewFindingSchema).max(12),
+});
+export type UnitReview = z.infer<typeof unitReviewSchema>;
+
 /** Request body for starting a unit build. */
 export const buildInputSchema = z.object({
   topic: z.string().min(1),

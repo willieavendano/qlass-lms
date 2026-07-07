@@ -14,6 +14,24 @@ type AssignmentDraft = {
   questions: string[];
 };
 type Drafts = { assignments: AssignmentDraft[]; material: { title: string; body: string } };
+type Review = {
+  summary: string;
+  clarityScore: number;
+  gradeLevelFit: "below" | "on_level" | "above";
+  sourceSafety: "pass" | "flagged";
+  findings: { target: string; severity: "info" | "warn" | "fix"; issue: string; suggestion?: string }[];
+};
+
+const GRADE_FIT_LABEL: Record<Review["gradeLevelFit"], string> = {
+  below: "Below grade level",
+  on_level: "On grade level",
+  above: "Above grade level",
+};
+const SEVERITY_STYLE: Record<Review["findings"][number]["severity"], string> = {
+  fix: "bg-red-50 text-red-700",
+  warn: "bg-amber-50 text-amber-700",
+  info: "bg-slate-100 text-slate-600",
+};
 
 export function BuildWithAi({
   classId,
@@ -33,6 +51,7 @@ export function BuildWithAi({
   });
   const [runId, setRunId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Drafts | null>(null);
+  const [review, setReview] = useState<Review | null>(null);
 
   async function start(e: React.FormEvent) {
     e.preventDefault();
@@ -51,6 +70,7 @@ export function BuildWithAi({
     }
     setRunId(d.run.id);
     setDrafts(d.run.drafts);
+    setReview(d.run.review ?? null);
     setPhase("review");
   }
 
@@ -151,6 +171,56 @@ export function BuildWithAi({
                 AI-generated — review before use
               </span>
             </div>
+            {review && (
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-900">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  AI reviewer
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                  <span className="rounded bg-slate-100 px-2 py-1 text-slate-600">
+                    Clarity {review.clarityScore}/5
+                  </span>
+                  <span
+                    className={`rounded px-2 py-1 ${
+                      review.gradeLevelFit === "on_level"
+                        ? "bg-teal-50 text-teal-700"
+                        : "bg-amber-50 text-amber-700"
+                    }`}
+                  >
+                    {GRADE_FIT_LABEL[review.gradeLevelFit]}
+                  </span>
+                  <span
+                    className={`rounded px-2 py-1 ${
+                      review.sourceSafety === "pass"
+                        ? "bg-teal-50 text-teal-700"
+                        : "bg-red-50 text-red-700"
+                    }`}
+                  >
+                    {review.sourceSafety === "pass" ? "Sources OK" : "Sources flagged"}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{review.summary}</p>
+                {review.findings.length > 0 && (
+                  <ul className="mt-2 space-y-1">
+                    {review.findings.map((f, i) => (
+                      <li key={i} className="text-sm">
+                        <span
+                          className={`mr-2 rounded px-1.5 py-0.5 text-xs uppercase ${SEVERITY_STYLE[f.severity]}`}
+                        >
+                          {f.severity}
+                        </span>
+                        <span className="text-slate-500">{f.target}:</span> {f.issue}
+                        {f.suggestion && (
+                          <span className="block pl-2 text-xs text-slate-500">
+                            Suggestion: {f.suggestion}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
             {drafts.assignments.map((a, i) => (
               <div
                 key={i}

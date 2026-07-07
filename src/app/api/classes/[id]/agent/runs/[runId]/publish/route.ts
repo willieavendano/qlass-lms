@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { requireClassAccess } from "@/lib/permissions";
 import { unitDraftsSchema } from "@/lib/agent/schemas";
+import { notifyUsers } from "@/lib/notify";
 
 // The teacher may edit/trim drafts client-side, so accept the final drafts in the body.
 const schema = z.object({ drafts: unitDraftsSchema });
@@ -68,15 +69,15 @@ export async function POST(
       select: { userId: true },
     });
     if (students.length && created.length) {
-      await prisma.notification.createMany({
-        data: students.map((s) => ({
-          userId: s.userId,
+      await notifyUsers(
+        students.map((s) => s.userId),
+        {
           type: NotificationType.ASSIGNMENT_DUE,
           title: `New classwork in your class`,
           body: `${created.length} new assignment(s) published`,
           link: `/class/${params.id}/classwork`,
-        })),
-      });
+        }
+      );
     }
 
     const updated = await prisma.agentRun.update({

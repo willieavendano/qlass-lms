@@ -6,7 +6,8 @@ import { requireSession } from "@/lib/auth";
 import { requireClassAccess } from "@/lib/permissions";
 import { loadAiConfig } from "@/lib/ai";
 import { buildInputSchema } from "@/lib/agent/schemas";
-import { planUnit, authorDrafts } from "@/lib/agent/unit-builder";
+import { planUnit, authorDrafts, reviewDrafts } from "@/lib/agent/unit-builder";
+import type { UnitReview } from "@/lib/agent/schemas";
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const session = await requireSession();
@@ -47,9 +48,23 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         data: { status: "AUTHORING", outline },
       });
       const drafts = await authorDrafts(cfg, input, outline, memory?.summary);
+      await prisma.agentRun.update({
+        where: { id: run.id },
+        data: { status: "REVIEWING", drafts },
+      });
+
+      // Advisory AI reviewer — fail open so a reviewer error never blocks the
+      // teacher from reaching their drafts.
+      let review: UnitReview | null = null;
+      try {
+        review = await reviewDrafts(cfg, input, outline, drafts);
+      } catch (reviewError) {
+        console.error("[agent] reviewer pass failed (continuing):", reviewError);
+      }
+
       const updated = await prisma.agentRun.update({
         where: { id: run.id },
-        data: { status: "REVIEW", drafts },
+        data: { status: "REVIEW", ...(review ? { review } : {}) },
       });
 
       // Update per-course memory so later runs have context.

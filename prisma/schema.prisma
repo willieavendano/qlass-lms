@@ -72,6 +72,7 @@ model User {
   systemRole    SystemRole @default(STUDENT)
   suspended     Boolean   @default(false)
   emailDigest   EmailDigest @default(DAILY)
+  digestSentAt  DateTime?
   googleUserId  String?   @unique
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -366,6 +367,7 @@ model AgentRun {
   input     Json
   outline   Json?
   drafts    Json?
+  review    Json?
   model     String?
   error     String?  @db.Text
   createdAt DateTime @default(now())
