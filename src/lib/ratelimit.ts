@@ -1,8 +1,9 @@
 /**
- * Minimal fixed-window in-memory rate limiter. Sufficient for the single-
- * instance Railway deployment used in the pilot. If/when Qlass runs multiple
- * instances, swap this for a shared store (e.g. Upstash Redis) keyed the same
- * way — the call sites won't need to change.
+ * Minimal fixed-window in-memory rate limiter. Best-effort on Vercel (Fluid
+ * Compute reuses instances but doesn't guarantee a single process) and exact
+ * for a single self-hosted container. If stricter limits are needed, swap this
+ * for a shared store (e.g. Upstash Redis) keyed the same way — the call sites
+ * won't need to change.
  */
 
 type Bucket = { count: number; resetAt: number };
@@ -49,7 +50,7 @@ export function resetRateLimits() {
 }
 
 /**
- * Best-effort client IP from proxy headers (Railway/Vercel set
+ * Best-effort client IP from proxy headers (Vercel and most reverse proxies set
  * `x-forwarded-for`). Falls back to a constant so the limiter still applies a
  * shared bucket rather than failing open per-request.
  */

@@ -17,7 +17,7 @@ Effective config = user BYOK setting → instance SystemSettings → server env 
 
 ## Deployment policy: do NOT self-host models on the app host
 
-Never run the model on the same host that serves Qlass (Railway, Render, a
+Never run the model on the same host that serves Qlass (Vercel, Render, a
 small VPS). BYOK cloud APIs are the supported path for hosted deployments.
 
 - App hosts are CPU-only. A 12B-class model runs ~1–3 tok/s there; a unit

@@ -23,7 +23,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
-# Full node_modules (superset of the standalone trace) so the Railway
+# Full node_modules (superset of the standalone trace) so the
 # pre-deploy command (`prisma db push`) has the complete Prisma CLI dep tree
 # and bin symlink. server.js still resolves its modules from here.
 COPY --from=builder /app/node_modules ./node_modules

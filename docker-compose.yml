@@ -33,6 +33,7 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: postgresql://qlass:qlass@postgres:5432/qlass?schema=public
+      DIRECT_URL: postgresql://qlass:qlass@postgres:5432/qlass?schema=public
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: change-me-in-production
       STORAGE_PROVIDER: local

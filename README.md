@@ -101,15 +101,19 @@ All protected routes require a valid NextAuth session.
 docker compose --profile full up -d
 ```
 
-### Vercel + Supabase
+### Vercel + Supabase (reference hosted setup)
 
-1. Deploy Postgres on [Supabase](https://supabase.com)
-2. Set `DATABASE_URL`, `NEXTAUTH_*`, and `STORAGE_PROVIDER=supabase`
-3. Deploy to Vercel with the Next.js preset
+1. `vercel link` then `vercel integration add supabase` (Postgres + Storage from one project)
+2. Map `DATABASE_URL` / `DIRECT_URL` to the pooled / direct Supabase URLs, set `NEXTAUTH_*`,
+   `ENCRYPTION_KEY`, `CRON_SECRET`, and `STORAGE_PROVIDER=supabase`
+3. Push to `main` — `vercel.json` runs `prisma migrate deploy` before every build
 
-### Railway / Render / Fly.io
+Full steps in [docs/deployment.md](docs/deployment.md).
 
-Use the included `Dockerfile` or the Node buildpack with `npm run build` and `npm start`.
+### Render / Fly.io / VPS
+
+Use the included `Dockerfile` (or the Node buildpack with `npm run build` and `npm start`)
+and run `npm run db:migrate:deploy` before start.
 
 ## Environment variables
 
