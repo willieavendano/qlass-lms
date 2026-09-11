@@ -24,7 +24,11 @@ through the Vercel Marketplace so env vars land in the project automatically.
 3. **Set the app secrets** for `production` and `preview`: `NEXTAUTH_SECRET`,
    `ENCRYPTION_KEY`, `CRON_SECRET`, `STORAGE_PROVIDER=supabase`,
    `SUPABASE_STORAGE_BUCKET=qlass-uploads`, and `NEXTAUTH_URL` (the exact
-   public URL, e.g. `https://qlass-<team>.vercel.app`).
+   public URL, e.g. `https://qlass-<team>.vercel.app`). Set `NEXTAUTH_URL` on
+   `production` only: preview URLs change per deployment and NextAuth trusts
+   Vercel's forwarded host there. Preview deployments also share the single
+   Supabase resource (and its database) with production, so treat preview
+   testing as testing against live data.
 4. **Create the storage bucket** `qlass-uploads` (private) in Supabase Storage.
    The app only ever hands out short-lived signed URLs, so keep it private.
 5. **Deploy.** `vercel.json` sets the build command to
