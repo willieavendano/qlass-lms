@@ -9,6 +9,10 @@ import { buildInputSchema } from "@/lib/agent/schemas";
 import { planUnit, authorDrafts, reviewDrafts } from "@/lib/agent/unit-builder";
 import type { UnitReview } from "@/lib/agent/schemas";
 
+// The plan → author → review pipeline runs synchronously in this request.
+// Allow the full Vercel Functions window so slow BYOK models don't get cut off.
+export const maxDuration = 300;
+
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const session = await requireSession();
   const membership = await requireClassAccess(session.user.id, params.id, [

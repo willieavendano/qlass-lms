@@ -6,6 +6,7 @@ import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { renderDigestEmail } from "@/lib/email-templates";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 300;
 
 const FALLBACK_WINDOW_MS = 24 * 60 * 60 * 1000;
 

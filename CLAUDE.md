@@ -47,6 +47,10 @@ Two env files are required and must stay in sync: the Prisma CLI reads `.env`, N
 
 **Agentic course builder** (`src/lib/agent/*`, `src/lib/ai.ts`, `src/lib/oer.ts`, `src/lib/crypto.ts`): teachers can build AI-generated unit drafts. Providers are BYOK/local/env, resolved as user setting -> instance setting -> env. Keys are encrypted at rest with `ENCRYPTION_KEY`. Generated posts carry `Post.aiGenerated = true`. Every run is an auditable `AgentRun`. Keep the teacher review gate mandatory.
 
+## Deployment
+
+Production runs on Vercel (team `null-design`, project `qlass`, auto-deploys `main`) with Supabase for Postgres and file storage. `vercel.json` owns the build command (`prisma migrate deploy && npm run build`) and the daily digest cron. Prisma uses `DATABASE_URL` (pooled) at runtime and `DIRECT_URL` (direct) for migrations; both must be set everywhere the CLI runs. Schema changes ship as checked-in migrations under `prisma/migrations/`, never `db push`. See `docs/deployment.md`.
+
 ## Data model
 
 The core graph: `Class` <- `ClassMembership` -> `User`. A `Post` belongs to a class; ASSIGNMENT posts have a 1:1 `Assignment`; QUESTION posts have a 1:1 `Question`. Students create one `Submission` per assignment, which gets a 1:1 `Grade`. `Attachment` attaches to either a Post or Submission. `Notification` is per-user with read flags. Account/Session/VerificationToken are standard NextAuth Prisma adapter tables.
